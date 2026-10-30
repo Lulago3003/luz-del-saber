@@ -1,0 +1,34 @@
+{
+  "_ayuda": "Aquí se cambian los datos de la escuela sin tocar el diseño. Lo que quede vacío (\"\") sale en la página como 'Por confirmar'. Cuando estén todos los datos, cambia \"enPreparacion\" a false. En diciembre, cambia \"mesPatrio\" a false para quitar la decoración de fiestas patrias.",
+  "enPreparacion": true,
+  "mesPatrio": true,
+  "contacto": {
+    "whatsapp": "",
+    "whatsappVisible": "",
+    "telefono": "",
+    "telefonoVisible": "",
+    "horario": "",
+    "facebook": "",
+    "instagram": ""
+  },
+  "ubicacion": {
+    "_ayuda": "Para que el mapa y los botones de Google Maps y Waze lleven a la puerta, pega aquí la latitud y la longitud (en Google Maps: mantén presionado sobre la escuela y copia los dos números que aparecen).",
+    "direccion": "",
+    "zona": "Panamá Oeste",
+    "referencias": [],
+    "lat": null,
+    "lng": null
+  },
+  "avisos": [
+    {
+      "etiqueta": "Fiestas patrias",
+      "titulo": "Noviembre, mes de la patria",
+      "texto": "Los niños celebran a Panamá aprendiendo sobre la bandera, el escudo y el himno nacional."
+    },
+    {
+      "etiqueta": "Año escolar 2027",
+      "titulo": "Pregunta por cupos",
+      "texto": "¿Tu hijo entra a pre-kínder, kínder o primer grado el próximo año? Escríbenos o pasa por la escuela."
+    }
+  ]
+}
