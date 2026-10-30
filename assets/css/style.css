@@ -60,6 +60,8 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--f-head); font-weight: 600; line-h
 p, dl, dd { margin: 0; }
 ul, ol { margin: 0; padding: 0; list-style: none; }
 [hidden] { display: none !important; }
+html:not(.tema-patria) [data-tema="patria"],
+html:not(.tema-navidad) [data-tema="navidad"] { display: none !important; }
 
 .wrap { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: 20px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
@@ -89,23 +91,26 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .btn--waze:hover { box-shadow: 0 6px 0 #1C9AC4; }
 .btn--blanco { background: var(--white); color: var(--ink); box-shadow: 0 4px 0 rgba(29, 42, 68, .18); }
 .btn--blanco svg { color: #25D366; }
+.btn--blanco.btn--sin-icono-color svg { color: var(--rojo); }
 .btn--linea { background: transparent; border-color: var(--ink); color: var(--ink); }
 .btn--linea:hover { background: var(--ink); color: var(--white); }
 .btn--full { width: 100%; }
 
 /* ---------- Franjas de arriba ---------- */
-.patria-cinta {
+.cinta {
   display: flex; align-items: center; justify-content: center; gap: 10px;
-  padding: 8px 20px; background: var(--pa-azul); color: var(--white); font-size: .9375rem; text-align: center;
+  padding: 8px 20px; color: var(--white); font-size: .9375rem; text-align: center;
 }
-.patria-cinta a { color: #FFD9DA; font-weight: 700; text-underline-offset: 3px; margin-left: 4px; }
+.cinta a { font-weight: 700; text-underline-offset: 3px; margin-left: 4px; }
+.cinta--patria { background: var(--pa-azul); }
+.cinta--patria a { color: #FFD9DA; }
+.cinta--navidad { background: #1F6B3A; }
+.cinta--navidad a { color: #FFE08A; }
 .mini-bandera { width: 27px; height: 18px; flex: none; border-radius: 2px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .5); }
-.prep { padding: 8px 20px; background: var(--amarillo); color: var(--ink); font-size: .9063rem; text-align: center; }
-.prep__corto { display: none; }
+.mini-arbol { width: 18px; height: 22px; flex: none; }
 @media (max-width: 560px) {
-  .patria-cinta, .prep { padding: 6px 14px; font-size: .8125rem; line-height: 1.35; }
-  .patria-cinta a, .prep__mas { display: none; }
-  .prep__corto { display: inline; }
+  .cinta { padding: 7px 14px; font-size: .875rem; line-height: 1.35; }
+  .cinta a { display: none; }
   .mini-bandera { width: 21px; height: 14px; }
 }
 
@@ -166,7 +171,27 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='22' viewBox='0 0 72 22'%3E%3Cpath d='M0 1.5Q36 5 72 1.5' fill='none' stroke='%231D2A44' stroke-width='1.2' opacity='.5'/%3E%3Cpath d='M2 2h20l-10 18z' fill='%23DA121A'/%3E%3Cpath d='M26 2.6h20l-10 18z' fill='%23fff' stroke='%23d9dde6'/%3E%3Cpath d='M50 2h20l-10 18z' fill='%23072357'/%3E%3C/svg%3E") repeat-x 0 0 / 72px 22px;
 }
 .banderines--grande { height: 33px; background-size: 108px 33px; }
-.top .banderines { position: absolute; left: 0; right: 0; top: 100%; pointer-events: none; }
+.top .banderines, .top .luces { position: absolute; left: 0; right: 0; top: 100%; pointer-events: none; }
+
+/* Luces de Navidad: el cable con los sockets abajo, y dos juegos de bombillos que se turnan */
+.luces {
+  position: relative; height: 30px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='30' viewBox='0 0 96 30'%3E%3Cpath d='M0 4Q48 14 96 4' fill='none' stroke='%231E4D2B' stroke-width='1.6'/%3E%3Cg fill='%231E4D2B'%3E%3Crect x='9.5' y='5' width='5' height='5' rx='1'/%3E%3Crect x='33.5' y='7.5' width='5' height='5' rx='1'/%3E%3Crect x='57.5' y='7.5' width='5' height='5' rx='1'/%3E%3Crect x='81.5' y='5' width='5' height='5' rx='1'/%3E%3C/g%3E%3C/svg%3E") repeat-x 0 0 / 96px 30px;
+}
+.luces::before, .luces::after {
+  content: ""; position: absolute; inset: 0; background-repeat: repeat-x; background-size: inherit;
+  filter: drop-shadow(0 0 3px rgba(255, 236, 160, .9));
+}
+.luces::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='30' viewBox='0 0 96 30'%3E%3Cellipse cx='12' cy='16.5' rx='4.5' ry='7' fill='%23FF3B30'/%3E%3Cellipse cx='60' cy='19' rx='4.5' ry='7' fill='%2334C759'/%3E%3C/svg%3E");
+  animation: titila 1.8s ease-in-out infinite;
+}
+.luces::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='30' viewBox='0 0 96 30'%3E%3Cellipse cx='36' cy='19' rx='4.5' ry='7' fill='%23FFCC00'/%3E%3Cellipse cx='84' cy='16.5' rx='4.5' ry='7' fill='%233AA0FF'/%3E%3C/svg%3E");
+  animation: titila 1.8s ease-in-out .9s infinite;
+}
+@keyframes titila { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+.luces--grande { height: 45px; background-size: 144px 45px; }
 
 /* ---------- Portada ---------- */
 .hero {
@@ -174,7 +199,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   padding: 64px 0 0;
   background: linear-gradient(180deg, var(--cielo) 0%, var(--cielo-2) 78%, var(--cielo-2) 100%);
 }
-.patrio .hero { padding-top: 80px; }
+.tema-patria .hero, .tema-navidad .hero { padding-top: 80px; }
 .nube { position: absolute; width: 160px; height: 46px; border-radius: 999px; background: var(--white); opacity: .85; pointer-events: none; }
 .nube::before, .nube::after { content: ""; position: absolute; border-radius: 50%; background: inherit; }
 .nube::before { width: 70px; height: 70px; left: 26px; top: -34px; }
@@ -183,6 +208,13 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .nube--2 { right: 6%; top: 60px; transform: scale(.7); animation: nube 52s linear infinite alternate-reverse; }
 @keyframes nube { from { translate: -30px 0; } to { translate: 60px 0; } }
 
+.copos { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.copos i {
+  position: absolute; top: -12px; left: var(--x); width: var(--s); height: var(--s); border-radius: 50%;
+  background: var(--white); box-shadow: 0 0 0 1px rgba(47, 125, 209, .12), 0 0 8px rgba(255, 255, 255, .9);
+  animation: cae var(--d) linear var(--r) infinite;
+}
+@keyframes cae { from { transform: translate(0, -20px); } to { transform: translate(28px, 1400px); } }
 .hero__in { position: relative; display: grid; grid-template-columns: 1fr 1.05fr; align-items: center; gap: 48px; padding-bottom: 36px; }
 
 .hero h1 { font-weight: 700; }
@@ -259,7 +291,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 @media (max-width: 900px) {
   .hero { padding-top: 40px; }
-  .patrio .hero { padding-top: 56px; }
+  .tema-patria .hero, .tema-navidad .hero { padding-top: 56px; }
   .hero__in { grid-template-columns: 1fr; gap: 44px; padding-bottom: 40px; }
   .foto { max-width: 560px; width: 100%; margin-inline: auto; }
   .nube--1 { display: none; }
@@ -312,9 +344,28 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .grado h3 { font-size: 1.875rem; }
 .grado__edad { display: inline-block; margin: 8px 0 14px; padding: 3px 12px; border-radius: 999px; background: var(--white); color: var(--c-ink); font-weight: 800; font-size: .9375rem; }
 .grado p:last-child { color: var(--ink-2); }
-.grados__nota { margin-top: 40px; font-size: 1.125rem; text-align: center; color: var(--ink-2); }
-.grados__nota a { color: var(--verde); font-weight: 800; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.grados { padding-bottom: 72px; }
 @media (max-width: 900px) { .grados__grid { grid-template-columns: 1fr; gap: 34px; max-width: 520px; margin-inline: auto; } }
+
+/* ---------- Inscríbete ---------- */
+.inscribete { padding: 0 0 96px; }
+.inscribete__card {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px 36px;
+  padding: 40px 44px; border-radius: 32px;
+  background: var(--amarillo) radial-gradient(rgba(255, 255, 255, .35) 2px, transparent 2.5px) 0 0 / 22px 22px;
+  box-shadow: 0 8px 0 #DFA11C;
+}
+.inscribete__buho { width: 112px; height: auto; }
+.inscribete__kicker { margin-bottom: 8px; font: 800 .8438rem/1.35 var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: #7A4B00; }
+.inscribete h2 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); }
+.inscribete__txt > p:last-child { margin-top: 10px; max-width: 34em; font-size: 1.125rem; color: #4A3A10; }
+.inscribete__btns { display: grid; gap: 12px; min-width: 240px; }
+@media (max-width: 900px) {
+  .inscribete { padding-bottom: 72px; }
+  .inscribete__card { grid-template-columns: 1fr; padding: 32px 24px; gap: 18px; }
+  .inscribete__buho { width: 84px; }
+  .inscribete__btns { min-width: 0; }
+}
 
 /* ---------- Cómo llegar ---------- */
 .llegar { background: var(--arena); }
@@ -377,6 +428,38 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .etiqueta-fecha { justify-self: start; margin: -4px 0 12px; }
 }
 
+/* ---------- Navidad ---------- */
+.navidad { position: relative; padding-top: 0; background: #1F6B3A; color: var(--white); overflow: hidden; }
+.navidad > .luces { margin-bottom: 64px; }
+.navidad .kicker { color: var(--amarillo); }
+.navidad .sec__head > p:not(.kicker) { color: rgba(255, 255, 255, .82); }
+.navidad__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+.navidad__arbol { width: 150px; height: auto; flex: none; margin-bottom: 44px; filter: drop-shadow(0 12px 18px rgba(0, 0, 0, .25)); }
+.fechas li { color: var(--ink); }
+.fechas--navidad li:nth-child(odd) .hoja small { background: var(--rojo); }
+.fechas--navidad li:nth-child(even) .hoja small { background: #1F6B3A; }
+.fechas--navidad li:nth-child(odd) .hoja b { color: var(--rojo); }
+.fechas--navidad li:nth-child(even) .hoja b { color: #1F6B3A; }
+.fechas--navidad .etiqueta-fecha { background: #1F6B3A; }
+.fechas--navidad .is-proxima { border-color: var(--amarillo); box-shadow: 0 0 0 4px rgba(255, 194, 61, .45); }
+@media (min-width: 1001px) { .fechas--navidad { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 700px) { .navidad__arbol { width: 84px; margin-bottom: 36px; } }
+@media (max-width: 420px) { .navidad__arbol { display: none; } }
+
+.regalo {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px 28px;
+  margin-top: 48px; padding: 28px 32px; border-radius: var(--r);
+  background: var(--white); color: var(--ink); box-shadow: 0 8px 0 rgba(0, 0, 0, .18);
+}
+.regalo__ico { width: 72px; height: 72px; }
+.regalo h3 { font-size: 1.5rem; }
+.regalo p { margin-top: 6px; color: var(--ink-2); }
+@media (max-width: 800px) {
+  .regalo { grid-template-columns: 1fr; padding: 24px 22px; }
+  .regalo__ico { width: 56px; height: 56px; }
+  .regalo .btn { width: 100%; }
+}
+
 /* ---------- Nosotros ---------- */
 .nosotros { background: var(--cielo-2); }
 .nosotros__grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 56px; align-items: center; }
@@ -422,6 +505,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .form [aria-invalid="true"] { border-color: var(--rojo); }
 .form__fila { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .form__msg { padding: 12px 14px; border-radius: 12px; background: #FDE1DF; color: #A61E18; font-weight: 700; font-size: .9688rem; }
+.form__msg.es-info { background: #DDF2E0; color: #24713A; }
 .form .btn { margin-top: 6px; }
 @media (max-width: 900px) { .contacto__grid { grid-template-columns: 1fr; gap: 40px; } }
 @media (max-width: 560px) { .form { padding: 24px 20px; } .form__fila { grid-template-columns: 1fr; } }

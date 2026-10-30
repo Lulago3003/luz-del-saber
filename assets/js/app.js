@@ -8,6 +8,7 @@
 
   var $ = function (sel, ctx) { return (ctx || document).querySelector(sel); };
   var $$ = function (sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); };
+  var html = document.documentElement;
 
   var datos = null;
 
@@ -29,15 +30,28 @@
     return 'https://wa.me/' + n + (msg ? '?text=' + encodeURIComponent(msg) : '');
   }
 
+  /* ---------- Temporada (patria / navidad / ninguna) ---------- */
+  function temaActual() {
+    return html.classList.contains('tema-patria') ? 'patria' : html.classList.contains('tema-navidad') ? 'navidad' : '';
+  }
+  function ponerTema(t) {
+    html.classList.remove('tema-patria', 'tema-navidad');
+    if (t === 'patria' || t === 'navidad') html.classList.add('tema-' + t);
+  }
+
+  /* ---------- Año escolar al que se inscribe (en Panamá empieza en marzo) ---------- */
+  var hoy = new Date();
+  var anioEscolar = hoy.getFullYear() + (hoy.getMonth() >= 8 ? 1 : 0);
+  $$('[data-anio-escolar]').forEach(function (el) { el.textContent = anioEscolar; });
+
   /* ---------- Ubicación: mapa, Google Maps y Waze ---------- */
   function ubicacion() {
-    var u = (datos && datos.ubicacion) || {};
+    var u = (datos && datos.ubicacion) || { lat: 8.9392252, lng: -79.642147, zona: 'Arraiján, Panamá Oeste' };
     var lat = parseFloat(u.lat), lng = parseFloat(u.lng);
     var hayPunto = isFinite(lat) && isFinite(lng);
     var texto = [u.direccion, u.zona, 'Panamá'].filter(Boolean).join(', ');
     return {
       exacta: hayPunto || !!u.direccion,
-      punto: hayPunto,
       embed: 'https://maps.google.com/maps?q=' + encodeURIComponent(hayPunto ? lat + ',' + lng : texto) +
         '&z=' + (hayPunto ? 17 : (u.direccion ? 15 : 10)) + '&hl=es&output=embed',
       maps: hayPunto
@@ -54,21 +68,20 @@
   function aplicar() {
     var c = datos.contacto || {};
 
-    // Franjas de arriba
-    $('#prep').hidden = datos.enPreparacion === false;
-    var patrio = datos.mesPatrio !== false;
-    document.documentElement.classList.toggle('patrio', patrio);
-    $$('[data-patrio]').forEach(function (el) { el.hidden = !patrio; });
+    // Temporada: la dirección (?tema=) manda; si no, lo que diga el archivo
+    var temporada = datos.temporada || 'auto';
+    if (!html.hasAttribute('data-tema-fijo') && temporada !== 'auto') ponerTema(temporada);
 
-    // Textos sueltos: vacío = "Por confirmar"
+    // Textos sueltos. Si el dato está vacío, se oculta su fila (o se lee "Por confirmar")
     $$('[data-c]').forEach(function (el) {
       var v = leer(datos, el.getAttribute('data-c'));
       var vacio = v == null || String(v).trim() === '';
-      el.textContent = vacio ? 'Por confirmar' : v;
-      el.classList.toggle('pendiente', vacio);
+      var fila = el.closest('[data-fila]');
+      if (fila) fila.hidden = vacio;
+      el.textContent = vacio ? (fila ? '' : 'Por confirmar') : v;
     });
 
-    // Botones de WhatsApp: sin número, llevan a la sección de contacto
+    // Botones de WhatsApp: sin número, llevan al formulario
     var hayWa = !!numeroWa();
     $$('[data-wa]').forEach(function (a) {
       if (hayWa) {
@@ -98,49 +111,59 @@
     $('#refsBox').hidden = !refs.length;
     $('#refs').innerHTML = refs.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('');
 
-    // Avisos
+    // Avisos: los que no dicen "tema" salen siempre; los demás, solo en su temporada
     if (Array.isArray(datos.avisos)) {
       var box = $('#avisos');
       box.innerHTML = datos.avisos.map(function (a) {
-        return '<article class="aviso">' +
+        return '<article class="aviso"' + (a.tema ? ' data-tema="' + esc(a.tema) + '"' : '') + '>' +
           (a.etiqueta ? '<p class="chip">' + esc(a.etiqueta) + '</p>' : '') +
           '<h3>' + esc(a.titulo || '') + '</h3>' +
           (a.texto ? '<p>' + esc(a.texto) + '</p>' : '') +
           '</article>';
       }).join('');
-      box.closest('section').hidden = !datos.avisos.length;
     }
+    revisarAvisos();
   }
+
+  function revisarAvisos() {
+    var t = temaActual();
+    var visibles = $$('#avisos .aviso').filter(function (a) {
+      var tema = a.getAttribute('data-tema');
+      return !tema || tema === t;
+    });
+    $('#avisos').closest('section').hidden = !visibles.length;
+  }
+  revisarAvisos();
 
   fetch('contenido.json', { cache: 'no-cache' })
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(function (json) { datos = json; aplicar(); })
     .catch(function () { /* sin archivo: se queda el contenido del HTML */ });
 
-  /* ---------- Fechas patrias: marcar la de hoy y la próxima ---------- */
-  (function () {
-    var hoy = new Date();
-    var items = $$('#fechas li');
-    if (hoy.getMonth() === 10) { // noviembre
-      var d = hoy.getDate(), proxima = null;
+  /* ---------- Fechas: marcar la de hoy y la próxima ---------- */
+  $$('.fechas[data-mes]').forEach(function (lista) {
+    var mes = +lista.getAttribute('data-mes');
+    var items = $$('li', lista);
+    var d = hoy.getDate(), proxima = null;
+    if (hoy.getMonth() === mes) {
       items.forEach(function (li) {
         var dia = +li.getAttribute('data-dia');
         if (dia < d) li.classList.add('is-pasada');
         else if (dia === d) marcar(li, 'is-hoy', '¡Hoy!');
         else if (!proxima) proxima = li;
       });
-      if (proxima && !$('#fechas .is-hoy')) marcar(proxima, 'is-proxima', 'Próxima');
-    } else if (hoy.getMonth() === 9 && items[0]) { // octubre: ya viene el 3
+      if (proxima && !$('.is-hoy', lista)) marcar(proxima, 'is-proxima', 'Próxima');
+    } else if ((hoy.getMonth() + 1) % 12 === mes && items[0]) {
       marcar(items[0], 'is-proxima', 'Ya viene');
     }
-    function marcar(li, clase, txt) {
-      li.classList.add(clase);
-      var s = document.createElement('span');
-      s.className = 'etiqueta-fecha';
-      s.textContent = txt;
-      li.appendChild(s);
-    }
-  })();
+  });
+  function marcar(li, clase, txt) {
+    li.classList.add(clase);
+    var s = document.createElement('span');
+    s.className = 'etiqueta-fecha';
+    s.textContent = txt;
+    li.appendChild(s);
+  }
 
   /* ---------- Letras que brincan ---------- */
   $$('.letras i').forEach(function (el, i) { el.style.setProperty('--n', i); });
@@ -189,9 +212,9 @@
 
   /* ---------- Compartir ubicación ---------- */
   $('#btnCompartir').addEventListener('click', function () {
-    var btn = this, label = $('span', btn);
+    var label = $('span', this);
     var u = ubicacion();
-    var texto = 'Centro Educativo Luz del Saber' + (u.exacta ? ' — ' + u.texto : '');
+    var texto = 'Centro Educativo Luz del Saber — ' + u.texto;
     function aviso(t) {
       var antes = label.textContent;
       label.textContent = t;
@@ -212,13 +235,13 @@
   var form = $('#form'), msg = $('#formMsg');
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var campos = ['acudiente', 'nino', 'grado'];
-    var faltan = campos.filter(function (n) {
+    var faltan = ['acudiente', 'nino', 'grado'].filter(function (n) {
       var el = form.elements[n];
       var vacio = !el.value.trim();
       el.setAttribute('aria-invalid', String(vacio));
       return vacio;
     });
+    msg.classList.remove('es-info');
     if (faltan.length) {
       msg.textContent = 'Completa tu nombre, el del niño o niña y el grado.';
       msg.hidden = false;
@@ -226,13 +249,14 @@
       return;
     }
     if (!numeroWa()) {
-      msg.textContent = 'Todavía estamos cargando el número de WhatsApp de la escuela. Mientras tanto, puedes pasar por la escuela en el horario de atención.';
+      msg.textContent = '¡Gracias! Muy pronto podrás enviarnos tu mensaje por WhatsApp desde aquí. Mientras tanto, te esperamos en la escuela.';
+      msg.classList.add('es-info');
       msg.hidden = false;
       return;
     }
     msg.hidden = true;
     var f = form.elements;
-    var texto = '¡Hola! 👋 Quisiera información sobre Luz del Saber.\n\n' +
+    var texto = '¡Hola! 👋 Me interesa que mi hijo/a estudie en Luz del Saber.\n\n' +
       '• Acudiente: ' + f.acudiente.value.trim() + '\n' +
       '• Niño o niña: ' + f.nino.value.trim() + '\n' +
       '• Grado: ' + f.grado.value +
@@ -244,5 +268,5 @@
   });
 
   /* ---------- Año en el pie ---------- */
-  $('#anio').textContent = new Date().getFullYear();
+  $('#anio').textContent = hoy.getFullYear();
 })();

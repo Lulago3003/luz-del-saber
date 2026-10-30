@@ -1,34 +1,38 @@
 {
-  "_ayuda": "Aquí se cambian los datos de la escuela sin tocar el diseño. Lo que quede vacío (\"\") sale en la página como 'Por confirmar'. Cuando estén todos los datos, cambia \"enPreparacion\" a false. En diciembre, cambia \"mesPatrio\" a false para quitar la decoración de fiestas patrias.",
-  "enPreparacion": true,
-  "mesPatrio": true,
+  "_ayuda": "Aquí se cambian los datos de la escuela sin tocar el diseño. Lo que quede vacío (\"\") no se muestra en la página.",
+  "temporada": "auto",
+  "_temporada": "auto = fiestas patrias del 20 de octubre al 30 de noviembre y Navidad del 1 de diciembre al 6 de enero. También se puede fijar: \"patria\", \"navidad\" o \"ninguna\".",
   "contacto": {
     "whatsapp": "",
     "whatsappVisible": "",
     "telefono": "",
     "telefonoVisible": "",
-    "horario": "",
-    "facebook": "",
-    "instagram": ""
+    "horario": ""
   },
   "ubicacion": {
-    "_ayuda": "Para que el mapa y los botones de Google Maps y Waze lleven a la puerta, pega aquí la latitud y la longitud (en Google Maps: mantén presionado sobre la escuela y copia los dos números que aparecen).",
     "direccion": "",
-    "zona": "Panamá Oeste",
+    "zona": "Arraiján, Panamá Oeste",
     "referencias": [],
-    "lat": null,
-    "lng": null
+    "lat": 8.9392252,
+    "lng": -79.642147
   },
   "avisos": [
     {
+      "tema": "patria",
       "etiqueta": "Fiestas patrias",
       "titulo": "Noviembre, mes de la patria",
       "texto": "Los niños celebran a Panamá aprendiendo sobre la bandera, el escudo y el himno nacional."
     },
     {
-      "etiqueta": "Año escolar 2027",
-      "titulo": "Pregunta por cupos",
-      "texto": "¿Tu hijo entra a pre-kínder, kínder o primer grado el próximo año? Escríbenos o pasa por la escuela."
+      "tema": "navidad",
+      "etiqueta": "Navidad",
+      "titulo": "¡Feliz Navidad!",
+      "texto": "Les deseamos a todas las familias una Navidad llena de paz, alegría y unión."
+    },
+    {
+      "etiqueta": "Inscripciones",
+      "titulo": "¿Buscas escuela para tus hijos?",
+      "texto": "Pregunta por cupos para pre-kínder, kínder y primer grado. ¡Escríbenos o visítanos!"
     }
   ]
 }
