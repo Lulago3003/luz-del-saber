@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lulago3003.github.io/luz-del-saber/sitemap.xml

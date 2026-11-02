@@ -1,0 +1,55 @@
+{
+  "_ayuda": "Lo más fácil es editar esto desde el panel: agrega #admin al final de la dirección de la página. Lo que quede vacío (\"\") no se muestra.",
+  "temporada": "auto",
+  "contacto": {
+    "whatsapp": "",
+    "whatsappVisible": "",
+    "telefono": "",
+    "telefonoVisible": "",
+    "horario": ""
+  },
+  "ubicacion": {
+    "direccion": "",
+    "zona": "Arraiján, Panamá Oeste",
+    "referencias": [],
+    "lat": 8.9392252,
+    "lng": -79.642147
+  },
+  "avisos": [
+    {
+      "id": "a1",
+      "tipo": "sin-clases",
+      "titulo": "Sin clases por fiestas patrias",
+      "texto": "El martes 3, el miércoles 4 y el jueves 5 de noviembre no hay clases: son días de fiesta nacional.",
+      "fecha": "2026-11-03",
+      "hasta": "2026-11-05",
+      "destacado": true
+    },
+    {
+      "id": "a2",
+      "tipo": "sin-clases",
+      "titulo": "Feriado del 10 de noviembre",
+      "texto": "No hay clases por el Primer Grito de Independencia de la Villa de Los Santos.",
+      "fecha": "2026-11-10"
+    },
+    {
+      "id": "a3",
+      "tipo": "sin-clases",
+      "titulo": "Día de las Madres",
+      "texto": "El 8 de diciembre es feriado nacional y no hay clases. ¡Feliz día a todas las mamás!",
+      "fecha": "2026-12-08"
+    },
+    {
+      "id": "a4",
+      "tipo": "novedad",
+      "titulo": "¡Estrenamos página web!",
+      "texto": "Aquí vas a encontrar los avisos de la escuela: días sin clases, reuniones, actividades y novedades."
+    },
+    {
+      "id": "a5",
+      "tipo": "inscripciones",
+      "titulo": "¿Buscas escuela para tus hijos?",
+      "texto": "Pregunta por cupos para pre-kínder, kínder y primer grado. ¡Escríbenos o visítanos!"
+    }
+  ]
+}
