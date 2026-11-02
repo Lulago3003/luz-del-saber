@@ -1,7 +1,6 @@
 {
-  "_ayuda": "Aquí se cambian los datos de la escuela sin tocar el diseño. Lo que quede vacío (\"\") no se muestra en la página.",
+  "_ayuda": "Lo más fácil es editar esto desde el panel: agrega #admin al final de la dirección de la página. Lo que quede vacío (\"\") no se muestra.",
   "temporada": "auto",
-  "_temporada": "auto = fiestas patrias del 20 de octubre al 30 de noviembre y Navidad del 1 de diciembre al 6 de enero. También se puede fijar: \"patria\", \"navidad\" o \"ninguna\".",
   "contacto": {
     "whatsapp": "",
     "whatsappVisible": "",
@@ -18,19 +17,37 @@
   },
   "avisos": [
     {
-      "tema": "patria",
-      "etiqueta": "Fiestas patrias",
-      "titulo": "Noviembre, mes de la patria",
-      "texto": "Los niños celebran a Panamá aprendiendo sobre la bandera, el escudo y el himno nacional."
+      "id": "a1",
+      "tipo": "sin-clases",
+      "titulo": "Sin clases por fiestas patrias",
+      "texto": "El martes 3, el miércoles 4 y el jueves 5 de noviembre no hay clases: son días de fiesta nacional.",
+      "fecha": "2026-11-03",
+      "hasta": "2026-11-05",
+      "destacado": true
     },
     {
-      "tema": "navidad",
-      "etiqueta": "Navidad",
-      "titulo": "¡Feliz Navidad!",
-      "texto": "Les deseamos a todas las familias una Navidad llena de paz, alegría y unión."
+      "id": "a2",
+      "tipo": "sin-clases",
+      "titulo": "Feriado del 10 de noviembre",
+      "texto": "No hay clases por el Primer Grito de Independencia de la Villa de Los Santos.",
+      "fecha": "2026-11-10"
     },
     {
-      "etiqueta": "Inscripciones",
+      "id": "a3",
+      "tipo": "sin-clases",
+      "titulo": "Día de las Madres",
+      "texto": "El 8 de diciembre es feriado nacional y no hay clases. ¡Feliz día a todas las mamás!",
+      "fecha": "2026-12-08"
+    },
+    {
+      "id": "a4",
+      "tipo": "novedad",
+      "titulo": "¡Estrenamos página web!",
+      "texto": "Aquí vas a encontrar los avisos de la escuela: días sin clases, reuniones, actividades y novedades."
+    },
+    {
+      "id": "a5",
+      "tipo": "inscripciones",
       "titulo": "¿Buscas escuela para tus hijos?",
       "texto": "Pregunta por cupos para pre-kínder, kínder y primer grado. ¡Escríbenos o visítanos!"
     }

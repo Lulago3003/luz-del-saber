@@ -1,0 +1,103 @@
+/* =========================================================
+   Panel de administración (#admin) — solo se carga al abrirlo
+   ========================================================= */
+
+.adm-abierto { overflow: hidden; }
+.adm {
+  position: fixed; inset: 0; z-index: 200; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  background: #F1F4F9; color: var(--ink);
+}
+
+/* Clave */
+.adm__candado { max-width: 400px; margin: 0 auto; padding: 64px 20px 40px; text-align: center; }
+.adm__buho { width: 92px; height: auto; margin: 0 auto 16px; }
+.adm__candado h2 { font-size: 1.75rem; margin-bottom: 8px; }
+.adm__candado > p { color: var(--muted); margin-bottom: 24px; }
+.adm__candado form { display: grid; gap: 12px; text-align: left; }
+
+/* Barra de arriba */
+.adm__barra { position: sticky; top: 0; z-index: 2; background: var(--ink); color: var(--white); box-shadow: 0 6px 18px -10px rgba(0, 0, 0, .5); }
+.adm__barra-in { display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 760px; margin: 0 auto; padding: 12px 20px; }
+.adm__titulo { font: 700 1.125rem/1.2 var(--f-head); }
+.adm__btn-sm { min-height: 40px; padding: 8px 16px; font-size: .9375rem; border-color: rgba(255, 255, 255, .6); color: var(--white); }
+.adm__btn-sm:hover { background: var(--white); color: var(--ink); }
+.adm__estado { max-width: 760px; margin: -4px auto 0; padding: 0 20px 10px; font-weight: 700; font-size: .9375rem; color: #FFD54D; }
+.adm__estado:empty { display: none; }
+.adm__estado.ok { color: #7EE08F; }
+.adm__estado.err { color: #FF9C93; }
+
+/* Cajas */
+.adm__cuerpo { display: grid; gap: 18px; max-width: 760px; margin: 0 auto; padding: 20px 16px 64px; }
+.adm__caja { display: grid; gap: 14px; padding: 24px 22px; border-radius: 20px; background: var(--white); box-shadow: 0 1px 2px rgba(29, 42, 68, .06), 0 8px 24px -16px rgba(29, 42, 68, .3); }
+.adm__caja h3 { font-size: 1.375rem; }
+.adm__ayuda { margin-top: -6px; color: var(--muted); font-size: .9688rem; }
+.adm__sub { font-weight: 800; font-size: .875rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+/* Campos */
+.adm__campo { display: grid; gap: 6px; font-weight: 700; font-size: .9375rem; }
+.adm__campo small { font-weight: 500; color: var(--muted); }
+.adm__opc { font-weight: 400; color: var(--muted); }
+.adm__campo input, .adm__campo select, .adm__campo textarea {
+  width: 100%; min-height: 50px; padding: 11px 13px;
+  border: 2px solid #D6DBE5; border-radius: 12px; background: var(--paper); color: var(--ink);
+  font: 600 1rem/1.4 var(--f-body);
+}
+.adm__campo textarea { resize: vertical; }
+.adm__campo input:focus, .adm__campo select:focus, .adm__campo textarea:focus { outline: none; border-color: var(--azul); box-shadow: 0 0 0 4px #DCEBFA; }
+.adm__fila2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.adm__check { display: flex; gap: 10px; align-items: flex-start; font-weight: 600; }
+.adm__check input { width: 22px; height: 22px; margin: 1px 0 0; flex: none; accent-color: var(--rojo); }
+.adm__error { min-height: 1em; color: var(--rojo); font-weight: 700; font-size: .9375rem; }
+.adm__error:empty { display: none; }
+
+/* Atajos */
+.adm__atajos { display: flex; flex-wrap: wrap; gap: 8px; }
+.adm__atajo {
+  padding: 10px 14px; border: 2px solid var(--line); border-radius: 999px; background: var(--paper); color: var(--ink);
+  font: 700 .9375rem/1.2 var(--f-body); cursor: pointer;
+}
+.adm__atajo:first-child { border-color: var(--rojo); background: #FDE1DF; color: #A61E18; }
+.adm__atajo:hover { border-color: var(--ink); }
+
+/* Formulario de un aviso */
+.adm__form-aviso { display: grid; gap: 12px; padding: 18px; border-radius: 16px; background: #FFF8E6; border: 2px solid var(--amarillo); scroll-margin-top: 110px; }
+.adm__form-t { font: 700 1.125rem/1.2 var(--f-head); }
+
+/* Lista de avisos */
+.adm__lista { display: grid; gap: 10px; }
+.adm__aviso {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 14px; border-radius: 14px; background: var(--paper); border: 2px solid var(--line); border-left: 6px solid var(--c);
+}
+.adm__aviso.es-pasado { opacity: .6; }
+.adm__aviso-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-bottom: 4px; font-size: .875rem; font-weight: 700; color: var(--muted); }
+.adm__aviso-meta .chip { font-size: .75rem; padding: 3px 10px; }
+.adm__aviso-t { font-weight: 800; }
+.adm__tag { padding: 2px 8px; border-radius: 999px; background: var(--ink); color: var(--white); font-size: .75rem; }
+.adm__tag--gris { background: #E3E7EF; color: var(--ink-2); }
+.adm__aviso-btns { display: flex; gap: 6px; flex: none; }
+.adm__aviso-btns button {
+  min-height: 40px; padding: 8px 12px; border: 2px solid var(--line); border-radius: 10px; background: var(--white);
+  font: 700 .875rem/1 var(--f-body); color: var(--ink); cursor: pointer;
+}
+.adm__aviso-btns .adm__borrar { color: #A61E18; }
+.adm__vacio { padding: 16px; border-radius: 14px; border: 2px dashed var(--line); text-align: center; color: var(--muted); }
+
+/* Temporada */
+.adm__opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.adm__opcion { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 2px solid var(--line); border-radius: 14px; cursor: pointer; }
+.adm__opcion:has(input:checked) { border-color: var(--verde); background: #DDF2E0; }
+.adm__opcion input { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: var(--verde); }
+.adm__opcion b { display: block; }
+.adm__opcion small { color: var(--muted); font-size: .875rem; }
+
+/* Publicar */
+.adm__caja--publicar { border: 3px solid var(--verde); }
+.adm__link { justify-self: center; padding: 6px; border: 0; background: none; color: var(--muted); font: 600 .875rem/1.2 var(--f-body); text-decoration: underline; cursor: pointer; }
+
+@media (max-width: 560px) {
+  .adm__fila2, .adm__opciones { grid-template-columns: 1fr; }
+  .adm__caja { padding: 20px 16px; }
+  .adm__aviso { flex-direction: column; align-items: stretch; }
+  .adm__aviso-btns button { flex: 1; }
+}

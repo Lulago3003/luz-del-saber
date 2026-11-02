@@ -22,18 +22,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=2">
+<link rel="stylesheet" href="assets/css/style.css?v=3">
 <script>
 /* Temporada: ?tema=patria | ?tema=navidad | ?tema=ninguna en la dirección, o automática por fecha
    (fiestas patrias del 20 de octubre al 30 de noviembre, Navidad del 1 de diciembre al 6 de enero). */
 (function () {
-  var h = document.documentElement, m = location.search.match(/[?&]tema=([a-z]+)/), t;
+  var h = document.documentElement, m = location.search.match(/[?&]tema=([a-z]+)/);
+  var d = new Date(), mes = d.getMonth(), dia = d.getDate();
+  var auto = (mes === 9 && dia >= 20) || mes === 10 ? 'patria' : (mes === 11 || (mes === 0 && dia <= 6)) ? 'navidad' : '';
+  var t = m ? m[1] : auto;
   h.classList.add('js');
-  if (m) { t = m[1]; h.setAttribute('data-tema-fijo', ''); }
-  else {
-    var d = new Date(), mes = d.getMonth(), dia = d.getDate();
-    t = (mes === 9 && dia >= 20) || mes === 10 ? 'patria' : (mes === 11 || (mes === 0 && dia <= 6)) ? 'navidad' : '';
-  }
+  h.setAttribute('data-tema-auto', auto);
+  if (m) h.setAttribute('data-tema-fijo', '');
   if (t === 'patria' || t === 'navidad') h.classList.add('tema-' + t);
 })();
 </script>
@@ -99,6 +99,16 @@
   </symbol>
 </svg>
 
+<!-- Aviso importante (sale solo cuando en contenido.json hay un aviso marcado "destacado") -->
+<div class="alerta" id="alerta" role="status" hidden>
+  <div class="alerta__in">
+    <svg class="alerta__ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9.5 17h-19z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4.5M12 17.5v.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    <p id="alertaTxt"></p>
+    <a class="alerta__ver" href="#avisos">Ver avisos</a>
+  </div>
+  <button class="alerta__x" id="alertaX" type="button" aria-label="Cerrar aviso">&times;</button>
+</div>
+
 <!-- Cintas de temporada (solo se ve la de la temporada activa) -->
 <div class="cinta cinta--patria" data-tema="patria">
   <svg class="mini-bandera" viewBox="0 0 30 20" aria-hidden="true"><use href="#bandera"/></svg>
@@ -113,17 +123,17 @@
 <header class="top" id="top">
   <div class="wrap top__in">
     <a class="marca" href="#inicio" aria-label="Centro Educativo Luz del Saber, ir al inicio">
-      <span class="marca__vagon" aria-hidden="true">L</span>
+      <span class="marca__vagon" aria-hidden="true">L<svg class="marca__gorro" data-tema="navidad" viewBox="0 0 40 30"><path d="M6 22C8 8 22 0 36 8l-6 14z" fill="#E1322B"/><rect x="2" y="20" width="32" height="8" rx="4" fill="#fff"/><circle cx="36" cy="8" r="4.5" fill="#fff"/></svg></span>
       <span class="marca__txt"><small>Centro Educativo</small>Luz del Saber</span>
     </a>
 
     <nav class="nav" id="nav" aria-label="Secciones">
       <ul>
+        <li><a href="#avisos">Avisos</a></li>
         <li><a href="#grados">Grados</a></li>
         <li><a href="#como-llegar">Cómo llegar</a></li>
         <li data-tema="patria"><a href="#patria">Mes de la patria</a></li>
         <li data-tema="navidad"><a href="#navidad">Navidad</a></li>
-        <li><a href="#nosotros">Nosotros</a></li>
         <li><a href="#contacto">Contacto</a></li>
       </ul>
       <a class="btn btn--rojo nav__cta" href="#inscribete">Inscripciones</a>
@@ -143,6 +153,8 @@
 <section class="hero">
   <div class="nube nube--1" aria-hidden="true"></div>
   <div class="nube nube--2" aria-hidden="true"></div>
+  <div class="estrellas" data-tema="navidad" aria-hidden="true"></div>
+  <div class="luna" data-tema="navidad" aria-hidden="true"></div>
   <div class="copos" data-tema="navidad" aria-hidden="true">
     <i style="--x:4%;--d:13s;--r:-2s;--s:7px"></i><i style="--x:12%;--d:17s;--r:-9s;--s:5px"></i>
     <i style="--x:21%;--d:15s;--r:-5s;--s:8px"></i><i style="--x:30%;--d:19s;--r:-12s;--s:5px"></i>
@@ -180,6 +192,13 @@
     </div>
 
     <figure class="foto">
+      <svg class="foto__lazo" data-tema="navidad" viewBox="0 0 120 80" aria-hidden="true">
+        <path d="M60 34C40 4 8 6 14 28c4 14 26 12 46 6z" fill="#E1322B"/>
+        <path d="M60 34C80 4 112 6 106 28c-4 14-26 12-46 6z" fill="#E1322B"/>
+        <path d="M54 38L36 76l12-4 6 8 6-38zM66 38l18 38-12-4-6 8-6-38z" fill="#C62828"/>
+        <path d="M60 34C46 16 26 14 26 24" fill="none" stroke="#FF6B61" stroke-width="3" stroke-linecap="round"/>
+        <rect x="50" y="26" width="20" height="16" rx="6" fill="#B71C1C"/>
+      </svg>
       <div class="foto__marco">
         <!-- Dibujo de la entrada. Si existe assets/img/escuela.jpg, la foto se pone encima. -->
         <svg class="foto__dibujo" viewBox="0 0 640 440" role="img" aria-labelledby="dibT">
@@ -238,7 +257,7 @@
         </svg>
         <img class="foto__img" src="assets/img/escuela.jpg" alt="Entrada del Centro Educativo Luz del Saber: portón blanco, techo de tejas y el muro pintado con el trencito de letras" width="1200" height="900" onerror="this.remove()">
       </div>
-      <figcaption>Busca el muro con el trencito de letras</figcaption>
+      <figcaption><span data-sin-tema="navidad">Busca el muro con el trencito de letras</span><span data-tema="navidad">¡Feliz Navidad desde Luz del Saber!</span></figcaption>
     </figure>
   </div>
 
@@ -259,6 +278,11 @@
           <path d="M2 74h12l6-6H8z" fill="#1D2A44"/>
           <g class="rueda"><circle cx="34" cy="74" r="12" fill="#1D2A44"/><circle cx="34" cy="74" r="4" fill="#FFC23D"/><path d="M34 63v22M23 74h22" stroke="#FFC23D" stroke-width="2"/></g>
           <g class="rueda"><circle cx="90" cy="74" r="12" fill="#1D2A44"/><circle cx="90" cy="74" r="4" fill="#FFC23D"/><path d="M90 63v22M79 74h22" stroke="#FFC23D" stroke-width="2"/></g>
+          <!-- banderita de fiestas patrias -->
+          <g data-tema="patria">
+            <path d="M104 12V-26" stroke="#1D2A44" stroke-width="3" stroke-linecap="round"/>
+            <use href="#bandera" x="105" y="-26" width="30" height="20"/>
+          </g>
           <!-- gorro de Navidad -->
           <g data-tema="navidad">
             <path d="M72 13C76-5 100-12 117-3l-8 16z" fill="#E1322B"/>
@@ -275,27 +299,28 @@
   </div>
 </section>
 
-<!-- ============ AVISOS ============ -->
-<section class="avisos" aria-labelledby="avisosT">
+<!-- ============ AVISOS Y NOVEDADES ============ -->
+<section class="sec avisos" id="avisos">
   <div class="wrap">
-    <h2 id="avisosT" class="sr">Avisos</h2>
-    <div class="avisos__list" id="avisos">
-      <article class="aviso" data-tema="patria">
-        <p class="chip">Fiestas patrias</p>
-        <h3>Noviembre, mes de la patria</h3>
-        <p>Los niños celebran a Panamá aprendiendo sobre la bandera, el escudo y el himno nacional.</p>
-      </article>
-      <article class="aviso" data-tema="navidad">
-        <p class="chip">Navidad</p>
-        <h3>¡Feliz Navidad!</h3>
-        <p>Les deseamos a todas las familias una Navidad llena de paz, alegría y unión.</p>
-      </article>
-      <article class="aviso">
-        <p class="chip">Inscripciones</p>
-        <h3>¿Buscas escuela para tus hijos?</h3>
-        <p>Pregunta por cupos para pre-kínder, kínder y primer grado. ¡Escríbenos o visítanos!</p>
+    <div class="avisos__head reveal">
+      <div>
+        <p class="kicker">Avisos y novedades</p>
+        <h2>Lo que las familias deben saber.</h2>
+      </div>
+      <p class="avisos__hoy" id="avisosHoy"></p>
+    </div>
+    <div class="avisos__list" id="avisosLista">
+      <article class="aviso c-morado">
+        <span class="aviso__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10v4h3l6 4V6L6 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg></span>
+        <div class="aviso__cuerpo">
+          <p class="aviso__meta"><span class="chip">Novedad</span></p>
+          <h3>¡Estrenamos página web!</h3>
+          <p>Aquí vas a encontrar los avisos de la escuela: días sin clases, reuniones, actividades y novedades.</p>
+        </div>
       </article>
     </div>
+    <p class="avisos__vacio" id="avisosVacio" hidden>No hay avisos por ahora. Aquí publicaremos los días sin clases, las reuniones, las actividades y las novedades de la escuela.</p>
+    <button class="btn btn--linea avisos__mas" id="avisosMas" type="button" hidden>Ver más avisos</button>
   </div>
 </section>
 
@@ -334,7 +359,10 @@
 <section class="inscribete" id="inscribete">
   <div class="wrap">
     <div class="inscribete__card reveal">
-      <svg class="inscribete__buho" viewBox="0 0 120 130" aria-hidden="true"><use href="#buho"/></svg>
+      <span class="inscribete__buho">
+        <svg viewBox="0 0 120 130" aria-hidden="true"><use href="#buho"/></svg>
+        <svg class="buho__gorro" data-tema="navidad" viewBox="0 0 80 50" aria-hidden="true"><path d="M10 38C14 14 40 0 70 12l-12 26z" fill="#E1322B"/><rect x="4" y="34" width="62" height="12" rx="6" fill="#fff"/><circle cx="70" cy="12" r="7" fill="#fff"/></svg>
+      </span>
       <div class="inscribete__txt">
         <p class="inscribete__kicker">Inscripciones abiertas · Año escolar <span data-anio-escolar>2027</span></p>
         <h2>¿Quieres que tus hijos estudien con nosotros?</h2>
@@ -609,6 +637,7 @@
       <p>Pre-kínder · Kínder · Primer grado<br>Arraiján, Panamá Oeste</p>
     </div>
     <nav aria-label="Pie de página">
+      <a href="#avisos">Avisos</a>
       <a href="#grados">Grados</a>
       <a href="#inscribete">Inscripciones</a>
       <a href="#como-llegar">Cómo llegar</a>
@@ -624,6 +653,6 @@
   <svg aria-hidden="true"><use href="#wa"/></svg>
 </a>
 
-<script src="assets/js/app.js?v=2" defer></script>
+<script src="assets/js/app.js?v=3" defer></script>
 </body>
 </html>

@@ -2,6 +2,7 @@
    Centro Educativo Luz del Saber — interacciones
    Lee contenido.json y llena la página con esos datos.
    Si el archivo no carga, se queda lo que ya trae el HTML.
+   El panel para editar se abre con #admin (assets/js/admin.js).
    ========================================================= */
 (function () {
   'use strict';
@@ -17,7 +18,7 @@
     return ruta.split('.').reduce(function (o, k) { return o == null ? undefined : o[k]; }, obj);
   }
   function esc(txt) {
-    return String(txt).replace(/[&<>"']/g, function (c) {
+    return String(txt == null ? '' : txt).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
@@ -30,6 +31,23 @@
     return 'https://wa.me/' + n + (msg ? '?text=' + encodeURIComponent(msg) : '');
   }
 
+  /* ---------- Fechas ---------- */
+  var MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  var DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+  var hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  function aFecha(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+  }
+  function diasDesdeHoy(f) { return Math.round((f - hoy) / 86400000); }
+  function largo(f, conAnio) {
+    return DIAS[f.getDay()] + ' ' + f.getDate() + ' de ' + MESES[f.getMonth()] + (conAnio ? ' de ' + f.getFullYear() : '');
+  }
+
+  $('#avisosHoy').textContent = 'Hoy es ' + largo(hoy);
+
   /* ---------- Temporada (patria / navidad / ninguna) ---------- */
   function temaActual() {
     return html.classList.contains('tema-patria') ? 'patria' : html.classList.contains('tema-navidad') ? 'navidad' : '';
@@ -37,10 +55,12 @@
   function ponerTema(t) {
     html.classList.remove('tema-patria', 'tema-navidad');
     if (t === 'patria' || t === 'navidad') html.classList.add('tema-' + t);
+    var color = $('meta[name="theme-color"]');
+    if (color) color.content = t === 'navidad' ? '#0D2440' : '#CDEBFB';
   }
+  ponerTema(temaActual());
 
   /* ---------- Año escolar al que se inscribe (en Panamá empieza en marzo) ---------- */
-  var hoy = new Date();
   var anioEscolar = hoy.getFullYear() + (hoy.getMonth() >= 8 ? 1 : 0);
   $$('[data-anio-escolar]').forEach(function (el) { el.textContent = anioEscolar; });
 
@@ -64,13 +84,120 @@
     };
   }
 
-  /* ---------- Aplicar contenido.json ---------- */
-  function aplicar() {
+  /* ---------- Avisos y novedades ---------- */
+  var TIPOS = {
+    'sin-clases':    { nombre: 'No hay clases', color: 'rojo',     ico: '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4M9.5 13l5 5M14.5 13l-5 5"/>' },
+    'reunion':       { nombre: 'Reunión',       color: 'azul',     ico: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.9.2 5 2.5 5 5.8"/>' },
+    'actividad':     { nombre: 'Actividad',     color: 'verde',    ico: '<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/>' },
+    'novedad':       { nombre: 'Novedad',       color: 'morado',   ico: '<path d="M3 10v4h3l6 4V6L6 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>' },
+    'inscripciones': { nombre: 'Inscripciones', color: 'amarillo', ico: '<path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4M10 12h6M10 16h6"/>' },
+    'importante':    { nombre: 'Importante',    color: 'naranja',  ico: '<path d="M12 3l9.5 17h-19z"/><path d="M12 10v4.5M12 17.5v.01"/>' }
+  };
+  function tipoDe(a) { return TIPOS[a.tipo] || TIPOS.novedad; }
+  function idDe(a) { return String(a.id || (a.titulo + '|' + (a.fecha || ''))); }
+
+  // Un aviso con fecha se quita solo cuando pasa ("hasta", o la misma fecha si no hay "hasta")
+  function vigente(a) {
+    if (a.tema && a.tema !== temaActual()) return false;
+    var fin = aFecha(a.hasta) || aFecha(a.fecha);
+    return !fin || diasDesdeHoy(fin) >= 0;
+  }
+
+  // "Mañana · martes 3 de noviembre", "Hoy · hasta el jueves 5 de noviembre"…
+  function cuando(a) {
+    var ini = aFecha(a.fecha), fin = aFecha(a.hasta);
+    if (!ini) return '';
+    if (fin && diasDesdeHoy(fin) <= diasDesdeHoy(ini)) fin = null;
+    var di = diasDesdeHoy(ini);
+    var rel = di === 0 ? 'Hoy' : di === 1 ? 'Mañana' : di === 2 ? 'Pasado mañana' : '';
+    var conAnio = ini.getFullYear() !== hoy.getFullYear();
+    if (fin) {
+      if (di <= 0) return 'Hoy · hasta el ' + largo(fin, conAnio);
+      var mismoMes = ini.getMonth() === fin.getMonth();
+      var rango = 'Del ' + DIAS[ini.getDay()] + ' ' + ini.getDate() + (mismoMes ? '' : ' de ' + MESES[ini.getMonth()]) + ' al ' + largo(fin, conAnio);
+      return rel ? rel + ' · ' + rango.charAt(0).toLowerCase() + rango.slice(1) : rango;
+    }
+    var dia = largo(ini, conAnio);
+    return rel ? rel + ' · ' + dia : dia.charAt(0).toUpperCase() + dia.slice(1);
+  }
+
+  function hojaHTML(a) {
+    var ini = aFecha(a.fecha), fin = aFecha(a.hasta);
+    if (!ini) return '<span class="aviso__ico" aria-hidden="true"><svg viewBox="0 0 24 24">' + tipoDe(a).ico + '</svg></span>';
+    var dias = ini.getDate() + (fin && fin > ini && fin.getMonth() === ini.getMonth() ? '–' + fin.getDate() : '');
+    return '<span class="aviso__hoja" aria-hidden="true"><small>' + MESES[ini.getMonth()].slice(0, 3) + '</small><b>' + dias + '</b></span>';
+  }
+
+  function ordenar(lista) {
+    return lista.slice().sort(function (a, b) {
+      if (!!b.destacado !== !!a.destacado) return b.destacado ? 1 : -1;
+      var fa = aFecha(a.fecha), fb = aFecha(b.fecha);
+      if (fa && fb) return fa - fb;
+      if (fa) return -1;
+      if (fb) return 1;
+      return 0;
+    });
+  }
+
+  // En el celular se muestran menos para no hacer la página tan larga
+  var MAX_AVISOS = window.matchMedia('(max-width: 700px)').matches ? 3 : 6;
+  function pintarAvisos() {
+    if (!datos || !Array.isArray(datos.avisos)) return;
+    var lista = ordenar(datos.avisos.filter(vigente));
+    var box = $('#avisosLista');
+    box.innerHTML = lista.map(function (a, i) {
+      var t = tipoDe(a), q = cuando(a);
+      return '<article class="aviso c-' + t.color + (a.destacado ? ' aviso--destacado' : '') + '"' + (i >= MAX_AVISOS ? ' data-extra hidden' : '') + '>' +
+        hojaHTML(a) +
+        '<div class="aviso__cuerpo">' +
+          '<p class="aviso__meta"><span class="chip">' + esc(t.nombre) + '</span>' + (q ? '<span class="aviso__cuando">' + esc(q) + '</span>' : '') + '</p>' +
+          '<h3>' + esc(a.titulo) + '</h3>' +
+          (a.texto ? '<p>' + esc(a.texto) + '</p>' : '') +
+        '</div>' +
+      '</article>';
+    }).join('');
+    $('#avisosVacio').hidden = lista.length > 0;
+    $('#avisosMas').hidden = lista.length <= MAX_AVISOS;
+    pintarAlerta(lista.filter(function (a) { return a.destacado; }));
+  }
+  $('#avisosMas').addEventListener('click', function () {
+    $$('#avisosLista [data-extra]').forEach(function (el) { el.hidden = false; });
+    this.hidden = true;
+  });
+
+  // Barra de arriba con el aviso destacado más próximo. Se puede cerrar.
+  var alerta = $('#alerta');
+  function cerrados() {
+    try { return JSON.parse(localStorage.getItem('lds_alertas_cerradas') || '[]'); } catch (e) { return []; }
+  }
+  function pintarAlerta(destacados) {
+    var lista = cerrados();
+    var a = destacados.filter(function (x) { return lista.indexOf(idDe(x)) < 0; })[0];
+    alerta.hidden = !a;
+    if (!a) return;
+    var t = tipoDe(a), q = cuando(a);
+    alerta.className = 'alerta c-' + t.color;
+    alerta.setAttribute('data-id', idDe(a));
+    $('#alertaTxt').innerHTML = (q ? '<b>' + esc(q.split(' · ')[0]) + ':</b> ' : '<b>' + esc(t.nombre) + ':</b> ') + esc(a.titulo) +
+      (q.indexOf(' · ') > 0 ? ' <span class="alerta__fecha">(' + esc(q.split(' · ')[1]) + ')</span>' : '');
+  }
+  $('#alertaX').addEventListener('click', function () {
+    var lista = cerrados();
+    lista.push(alerta.getAttribute('data-id'));
+    try { localStorage.setItem('lds_alertas_cerradas', JSON.stringify(lista.slice(-30))); } catch (e) { /* sin almacenamiento */ }
+    alerta.hidden = true;
+  });
+
+  /* ---------- Aplicar contenido.json (también lo usa el panel para la vista previa) ---------- */
+  function aplicar(json) {
+    datos = json;
     var c = datos.contacto || {};
 
-    // Temporada: la dirección (?tema=) manda; si no, lo que diga el archivo
-    var temporada = datos.temporada || 'auto';
-    if (!html.hasAttribute('data-tema-fijo') && temporada !== 'auto') ponerTema(temporada);
+    // Temporada: la dirección (?tema=) manda; si no, lo que diga el archivo o la fecha
+    if (!html.hasAttribute('data-tema-fijo')) {
+      var temporada = datos.temporada || 'auto';
+      ponerTema(temporada === 'auto' ? html.getAttribute('data-tema-auto') : temporada);
+    }
 
     // Textos sueltos. Si el dato está vacío, se oculta su fila (o se lee "Por confirmar")
     $$('[data-c]').forEach(function (el) {
@@ -111,36 +238,32 @@
     $('#refsBox').hidden = !refs.length;
     $('#refs').innerHTML = refs.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('');
 
-    // Avisos: los que no dicen "tema" salen siempre; los demás, solo en su temporada
-    if (Array.isArray(datos.avisos)) {
-      var box = $('#avisos');
-      box.innerHTML = datos.avisos.map(function (a) {
-        return '<article class="aviso"' + (a.tema ? ' data-tema="' + esc(a.tema) + '"' : '') + '>' +
-          (a.etiqueta ? '<p class="chip">' + esc(a.etiqueta) + '</p>' : '') +
-          '<h3>' + esc(a.titulo || '') + '</h3>' +
-          (a.texto ? '<p>' + esc(a.texto) + '</p>' : '') +
-          '</article>';
-      }).join('');
-    }
-    revisarAvisos();
+    pintarAvisos();
   }
 
-  function revisarAvisos() {
-    var t = temaActual();
-    var visibles = $$('#avisos .aviso').filter(function (a) {
-      var tema = a.getAttribute('data-tema');
-      return !tema || tema === t;
-    });
-    $('#avisos').closest('section').hidden = !visibles.length;
-  }
-  revisarAvisos();
+  window.LDS = { aplicar: aplicar, publicado: null, tipos: TIPOS };
 
   fetch('contenido.json', { cache: 'no-cache' })
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function (json) { datos = json; aplicar(); })
+    .then(function (json) {
+      window.LDS.publicado = json;
+      aplicar(json);
+      document.dispatchEvent(new Event('lds:listo'));
+    })
     .catch(function () { /* sin archivo: se queda el contenido del HTML */ });
 
-  /* ---------- Fechas: marcar la de hoy y la próxima ---------- */
+  /* ---------- Panel de administración (#admin) ---------- */
+  function cargarPanel() {
+    if (location.hash.toLowerCase() !== '#admin' || window.LDS.panel) return;
+    window.LDS.panel = true;
+    var s = document.createElement('script');
+    s.src = 'assets/js/admin.js?v=1';
+    document.body.appendChild(s);
+  }
+  window.addEventListener('hashchange', cargarPanel);
+  cargarPanel();
+
+  /* ---------- Fechas patrias y de diciembre: marcar la de hoy y la próxima ---------- */
   $$('.fechas[data-mes]').forEach(function (lista) {
     var mes = +lista.getAttribute('data-mes');
     var items = $$('li', lista);
